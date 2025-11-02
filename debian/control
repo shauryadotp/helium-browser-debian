@@ -1,0 +1,39 @@
+Source: helium-browser-bin
+Section: web
+Priority: optional
+Maintainer: Shaurya <shaurya@shauryadotp.me>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/imputnet/helium-linux
+Rules-Requires-Root: no
+
+Package: helium-browser-bin
+Architecture: amd64
+Depends: ${misc:Depends},
+         libgtk-3-0,
+         libnss3,
+         libasound2,
+         xdg-utils,
+         libxss1,
+         libcups2,
+         libgcrypt20,
+         fonts-liberation,
+         systemd,
+         dbus,
+         libpulse0,
+         pciutils,
+         libva2,
+         libffi8 | libffi7,
+         desktop-file-utils,
+         hicolor-icon-theme
+Recommends: pipewire,
+            upower
+Suggests: kdialog,
+          libgtk-4-1,
+          gnome-keyring,
+          kwalletmanager
+Description: Private, fast, and honest web browser based on Chromium
+ Helium is a privacy-focused web browser based on Chromium that provides
+ a fast and secure browsing experience while respecting user privacy.
+ .
+ This is a binary package that installs the precompiled Helium browser.

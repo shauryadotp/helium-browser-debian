@@ -1,0 +1,7 @@
+helium-browser-bin (0.5.8.1-1) unstable; urgency=medium
+
+  * Initial Debian package release
+  * Ported from Arch Linux AUR PKGBUILD
+  * Private, fast, and honest web browser based on Chromium
+
+ -- Shaurya <shaurya@shauryadotp.me>  Sun, 03 Nov 2025 01:01:00 +0530

@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+# SPDX-FileCopyrightText: 2025 Debian Contributors
+# SPDX-License-Identifier: 0BSD
+
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# No build needed - binary package
+
+override_dh_auto_test:
+	# No tests for binary package
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info

@@ -1,0 +1,73 @@
+# Helium Browser v0.5.8.1-1 - Debian Package Checksums
+# Generated: 2025-11-02
+# Maintainer: Shaurya <shaurya@shauryadotp.me>
+# Repository: https://github.com/shauryadotp/helium-browser-debian
+
+## Main Package
+File: helium-browser-bin_0.5.8.1-1_amd64.deb
+Size: 127 MB (132,512,544 bytes)
+SHA256: 072888e59494fa6197877dc108c07dc3c53c93d08c56df62b5ab3d3582206868
+MD5: 635c12c8cccd997c755b2dc839c41957
+
+## Debug Symbols Package (Optional)
+File: helium-browser-bin-dbgsym_0.5.8.1-1_amd64.deb
+Size: 19 MB (19,932,160 bytes)
+SHA256: 7da305e88b98f45fe06857060ccb579f36d6a1379e4659423d3ab4d930bd3b7a
+MD5: 76c26a12daa2324da2c41c5c9712c1fa
+
+## Verification
+
+### Using SHA256 (Recommended)
+sha256sum helium-browser-bin_0.5.8.1-1_amd64.deb
+# Expected: 072888e59494fa6197877dc108c07dc3c53c93d08c56df62b5ab3d3582206868
+
+### Using MD5
+md5sum helium-browser-bin_0.5.8.1-1_amd64.deb
+# Expected: 635c12c8cccd997c755b2dc839c41957
+
+## Installation
+
+### Download
+wget https://cdn.shauryadotp.me/helium-browser/debian/latest/helium-browser-bin_0.5.8.1-1_amd64.deb
+
+### Verify
+sha256sum helium-browser-bin_0.5.8.1-1_amd64.deb
+
+### Install
+sudo dpkg -i helium-browser-bin_0.5.8.1-1_amd64.deb
+sudo apt-get install -f
+
+### Launch
+helium-browser
+
+## More Information
+- Repository: https://github.com/shauryadotp/helium-browser-debian
+- Upstream: https://github.com/imputnet/helium-linux
+- Maintainer: Shaurya <shaurya@shauryadotp.me>
+- CDN: https://cdn.shauryadotp.me/helium-browser/debian/
+
+## Package Details
+- Package: helium-browser-bin
+- Version: 0.5.8.1-1
+- Architecture: amd64
+- Maintainer: Shaurya <shaurya@shauryadotp.me>
+- Description: Private, fast, and honest web browser based on Chromium
+- Homepage: https://github.com/imputnet/helium-linux
+
+## Dependencies
+The package automatically installs these dependencies if missing:
+- libgtk-3-0, libnss3, libasound2, xdg-utils
+- libxss1, libcups2, libgcrypt20, fonts-liberation
+- systemd, dbus, libpulse0, pciutils, libva2
+- libffi8 (or libffi7), desktop-file-utils, hicolor-icon-theme
+
+## Compatibility
+- Debian 11+ (Bullseye, Bookworm)
+- Ubuntu 20.04 LTS, 22.04 LTS, 24.04 LTS
+- Linux Mint 20+, 21+, 22+
+- Pop!_OS 20.04+, 22.04+
+- Other Debian-based distributions
+
+## Support
+- Issues: https://github.com/shauryadotp/helium-browser-debian/issues
+- Email: shaurya@shauryadotp.me
