@@ -2,13 +2,15 @@
 
 This repository contains the Debian packaging files for Helium Browser, ported from the Arch Linux AUR PKGBUILD.
 
+**Note:** This repository includes an automated workflow that checks for new Helium Browser releases daily and automatically builds updated packages. See [AUTOBUILD.md](AUTOBUILD.md) for details.
+
 ## About Helium Browser
 
 Helium is a private, fast, and honest web browser based on Chromium. It provides a privacy-focused browsing experience while maintaining compatibility with modern web standards.
 
 ## Download Prebuilt Package
 
-See [GitHub Releases](https://github.com/shauryadotp/helium-browser-debian/releases) for prebuilt `.deb` packages.
+See [GitHub Releases](https://github.com/shauryadotp/helium-browser-debian/releases) for prebuilt `.deb` packages. New releases are automatically created when upstream releases a new version.
 
 ## Building the Package
 
@@ -122,6 +124,16 @@ To remove configuration files as well:
 ```bash
 sudo apt-get purge helium-browser-bin
 ```
+
+## Automated Builds
+
+This repository uses GitHub Actions to automatically:
+- Check for new Helium Browser releases daily
+- Update package metadata and version numbers
+- Build Debian packages
+- Create GitHub releases with the built packages
+
+For more information about the autobuild workflow, see [AUTOBUILD.md](AUTOBUILD.md).
 
 ## Source
 

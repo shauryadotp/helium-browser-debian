@@ -1,0 +1,140 @@
+name: Auto-build and Release
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC to check for new versions
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+  push:
+    paths:
+      - '.github/workflows/autobuild.yml'
+      - 'scripts/check-version.sh'
+      - 'scripts/update-version.sh'
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y devscripts equivs build-essential curl wget
+          
+          # Install build dependencies from debian/control (including debhelper-compat = 13)
+          sudo mk-build-deps -i -r -t 'apt-get -y -o Debug::pkgProblemResolver=yes --no-install-recommends' debian/control
+
+      - name: Check for new version
+        id: version_check
+        run: |
+          chmod +x scripts/check-version.sh
+          ./scripts/check-version.sh
+
+      - name: Update version files
+        if: steps.version_check.outputs.new_version == 'true'
+        run: |
+          chmod +x scripts/update-version.sh
+          ./scripts/update-version.sh "${{ steps.version_check.outputs.version }}" \
+            "${{ steps.version_check.outputs.tarball_sha256 }}" \
+            "${{ steps.version_check.outputs.desktop_sha256 }}"
+
+      - name: Download and extract source
+        if: steps.version_check.outputs.new_version == 'true'
+        run: |
+          VERSION="${{ steps.version_check.outputs.version }}"
+          TARBALL="helium-${VERSION}-x86_64_linux.tar.xz"
+          
+          # Download tarball
+          wget "https://github.com/imputnet/helium-linux/releases/download/${VERSION}/${TARBALL}"
+          
+          # Download desktop file
+          wget -O helium.desktop "https://raw.githubusercontent.com/imputnet/helium-linux/${VERSION}/package/helium.desktop"
+          
+          # Verify checksums
+          echo "${{ steps.version_check.outputs.tarball_sha256 }}  ${TARBALL}" | sha256sum -c -
+          echo "${{ steps.version_check.outputs.desktop_sha256 }}  helium.desktop" | sha256sum -c -
+          
+          # Extract tarball
+          tar -xf "${TARBALL}"
+          
+          # Prepare desktop file
+          sed -i \
+            -e 's/Exec=chromium/Exec=helium-browser/' \
+            -e 's/Name=Helium$/Name=Helium Browser/' \
+            -e 's/Icon=helium/Icon=helium-browser/' \
+            "helium.desktop"
+
+      - name: Build Debian package
+        if: steps.version_check.outputs.new_version == 'true'
+        run: |
+          dpkg-buildpackage -us -uc -b
+
+      - name: Generate checksums
+        if: steps.version_check.outputs.new_version == 'true'
+        run: |
+          VERSION="${{ steps.version_check.outputs.version }}"
+          cd ..
+          
+          # Generate checksums file
+          {
+            echo "# Helium Browser Package Checksums"
+            echo ""
+            echo "## Main Package"
+            echo "File: helium-browser-bin_${VERSION}-1_amd64.deb"
+            echo -n "SHA256: "
+            sha256sum "helium-browser-bin_${VERSION}-1_amd64.deb" | awk '{print $1}'
+            echo -n "MD5: "
+            md5sum "helium-browser-bin_${VERSION}-1_amd64.deb" | awk '{print $1}'
+            echo ""
+            
+            if [ -f "helium-browser-bin-dbgsym_${VERSION}-1_amd64.deb" ]; then
+              echo "## Debug Symbols Package"
+              echo "File: helium-browser-bin-dbgsym_${VERSION}-1_amd64.deb"
+              echo -n "SHA256: "
+              sha256sum "helium-browser-bin-dbgsym_${VERSION}-1_amd64.deb" | awk '{print $1}'
+              echo -n "MD5: "
+              md5sum "helium-browser-bin-dbgsym_${VERSION}-1_amd64.deb" | awk '{print $1}'
+            fi
+          } > checksums.txt
+          
+          # Also save in the repo
+          cp checksums.txt helium-browser-debian/checksums.txt
+
+      - name: Commit version updates
+        if: steps.version_check.outputs.new_version == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: update to version ${{ steps.version_check.outputs.version }}"
+          git push
+
+      - name: Create Release
+        if: steps.version_check.outputs.new_version == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version_check.outputs.version }}-1
+          name: Helium Browser ${{ steps.version_check.outputs.version }}-1
+          body_path: RELEASE_TEMPLATE.md
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: false
+          files: |
+            ../helium-browser-bin_${{ steps.version_check.outputs.version }}-1_amd64.deb
+            ../helium-browser-bin-dbgsym_${{ steps.version_check.outputs.version }}-1_amd64.deb
+            ../checksums.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: No new version
+        if: steps.version_check.outputs.new_version != 'true'
+        run: |
+          echo "No new version detected. Current version is up to date."
