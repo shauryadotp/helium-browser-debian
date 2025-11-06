@@ -27,7 +27,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y debhelper devscripts build-essential curl wget
+          sudo apt-get install -y devscripts equivs build-essential curl wget
+          
+          # Install build dependencies from debian/control (including debhelper-compat = 13)
+          sudo mk-build-deps -i -r -t 'apt-get -y -o Debug::pkgProblemResolver=yes --no-install-recommends' debian/control
 
       - name: Check for new version
         id: version_check
