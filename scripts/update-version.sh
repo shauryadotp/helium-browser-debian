@@ -26,20 +26,12 @@ echo "==> New version: $NEW_VERSION"
 echo "==> Updating aur.PKGBUILD..."
 sed -i "s/^pkgver=.*/pkgver=$NEW_VERSION/" aur.PKGBUILD
 
-# Update sha256sums - need to handle multi-line array
-# First, escape the forward slashes in checksums for sed
-TARBALL_SHA256_ESCAPED="${TARBALL_SHA256//\//\\/}"
-DESKTOP_SHA256_ESCAPED="${DESKTOP_SHA256//\//\\/}"
+# Update sha256sums - find the current checksums and replace them
+CURRENT_TARBALL_SHA=$(grep -A1 "^sha256sums_x86_64=" aur.PKGBUILD | grep -oP "(?<=')[a-f0-9]{64}(?=')" | head -n1)
+CURRENT_DESKTOP_SHA=$(grep -A2 "^sha256sums_x86_64=" aur.PKGBUILD | grep -oP "(?<=')[a-f0-9]{64}(?=')" | tail -n1)
 
-# Find and replace the checksums
-sed -i "/^sha256sums_x86_64=/,/)/ {
-    /^sha256sums_x86_64=/ {
-        n
-        s/'[^']*'/'$TARBALL_SHA256_ESCAPED'/
-        n
-        s/'[^']*'/'$DESKTOP_SHA256_ESCAPED'/
-    }
-}" aur.PKGBUILD
+sed -i "s/$CURRENT_TARBALL_SHA/$TARBALL_SHA256/" aur.PKGBUILD
+sed -i "s/$CURRENT_DESKTOP_SHA/$DESKTOP_SHA256/" aur.PKGBUILD
 
 # 2. Update build.sh
 echo "==> Updating build.sh..."
