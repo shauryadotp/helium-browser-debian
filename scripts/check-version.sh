@@ -10,7 +10,7 @@ echo "==> Fetching latest helium-linux release..."
 # Get latest version from GitHub releases
 # Note: We use HTML parsing instead of the GitHub API to avoid rate limiting issues
 # The API has strict rate limits that could cause this workflow to fail
-LATEST_VERSION=$(curl -fsSL "https://github.com/imputnet/helium-linux/releases/latest" | grep -oP 'releases/tag/\K[0-9.]+' | head -1)
+LATEST_VERSION=$(curl -fsSL "https://github.com/imputnet/helium-linux/releases/latest" | grep -oP 'releases/tag/\K[0-9]+(\.[0-9]+)*' | head -1)
 
 if [ -z "$LATEST_VERSION" ]; then
     echo "Error: Could not fetch latest version from GitHub"

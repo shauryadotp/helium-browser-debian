@@ -30,8 +30,9 @@ sed -i "s/^pkgver=.*/pkgver=$NEW_VERSION/" aur.PKGBUILD
 CURRENT_TARBALL_SHA=$(grep -A1 "^sha256sums_x86_64=" aur.PKGBUILD | grep -oP "(?<=')[a-f0-9]{64}(?=')" | head -n1)
 CURRENT_DESKTOP_SHA=$(grep -A2 "^sha256sums_x86_64=" aur.PKGBUILD | grep -oP "(?<=')[a-f0-9]{64}(?=')" | tail -n1)
 
-sed -i "s/$CURRENT_TARBALL_SHA/$TARBALL_SHA256/" aur.PKGBUILD
-sed -i "s/$CURRENT_DESKTOP_SHA/$DESKTOP_SHA256/" aur.PKGBUILD
+# Use | as delimiter to avoid any potential issues with special characters
+sed -i "s|$CURRENT_TARBALL_SHA|$TARBALL_SHA256|" aur.PKGBUILD
+sed -i "s|$CURRENT_DESKTOP_SHA|$DESKTOP_SHA256|" aur.PKGBUILD
 
 # 2. Update build.sh
 echo "==> Updating build.sh..."
