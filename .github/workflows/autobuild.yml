@@ -123,6 +123,7 @@ jobs:
           body_path: RELEASE_TEMPLATE.md
           draft: false
           prerelease: false
+          fail_on_unmatched_files: false
           files: |
             ../helium-browser-bin_${{ steps.version_check.outputs.version }}-1_amd64.deb
             ../helium-browser-bin-dbgsym_${{ steps.version_check.outputs.version }}-1_amd64.deb

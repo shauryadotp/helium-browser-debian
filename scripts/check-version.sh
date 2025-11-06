@@ -8,6 +8,8 @@ set -euo pipefail
 echo "==> Fetching latest helium-linux release..."
 
 # Get latest version from GitHub releases
+# Note: We use HTML parsing instead of the GitHub API to avoid rate limiting issues
+# The API has strict rate limits that could cause this workflow to fail
 LATEST_VERSION=$(curl -fsSL "https://github.com/imputnet/helium-linux/releases/latest" | grep -oP 'releases/tag/\K[0-9.]+' | head -1)
 
 if [ -z "$LATEST_VERSION" ]; then
@@ -31,26 +33,27 @@ if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
     TARBALL_URL="https://github.com/imputnet/helium-linux/releases/download/${LATEST_VERSION}/${TARBALL}"
     DESKTOP_URL="https://raw.githubusercontent.com/imputnet/helium-linux/${LATEST_VERSION}/package/helium.desktop"
     
+    # Create temporary directory for downloads
+    TEMP_DIR=$(mktemp -d)
+    trap 'rm -rf "$TEMP_DIR"' EXIT
+    
     echo "==> Downloading tarball to calculate checksum..."
-    if ! wget -q "$TARBALL_URL" -O "/tmp/${TARBALL}"; then
+    if ! wget -q "$TARBALL_URL" -O "${TEMP_DIR}/${TARBALL}"; then
         echo "Error: Could not download tarball from $TARBALL_URL"
         exit 1
     fi
     
     echo "==> Downloading desktop file to calculate checksum..."
-    if ! wget -q "$DESKTOP_URL" -O "/tmp/helium.desktop"; then
+    if ! wget -q "$DESKTOP_URL" -O "${TEMP_DIR}/helium.desktop"; then
         echo "Error: Could not download desktop file from $DESKTOP_URL"
         exit 1
     fi
     
-    TARBALL_SHA256=$(sha256sum "/tmp/${TARBALL}" | awk '{print $1}')
-    DESKTOP_SHA256=$(sha256sum "/tmp/helium.desktop" | awk '{print $1}')
+    TARBALL_SHA256=$(sha256sum "${TEMP_DIR}/${TARBALL}" | awk '{print $1}')
+    DESKTOP_SHA256=$(sha256sum "${TEMP_DIR}/helium.desktop" | awk '{print $1}')
     
     echo "==> Tarball SHA256: $TARBALL_SHA256"
     echo "==> Desktop SHA256: $DESKTOP_SHA256"
-    
-    # Clean up downloaded files
-    rm -f "/tmp/${TARBALL}" "/tmp/helium.desktop"
     
     # Set outputs for GitHub Actions
     if [ -n "${GITHUB_OUTPUT:-}" ]; then
