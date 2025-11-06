@@ -54,10 +54,12 @@ if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
     
     # Set outputs for GitHub Actions
     if [ -n "${GITHUB_OUTPUT:-}" ]; then
-        echo "new_version=true" >> "$GITHUB_OUTPUT"
-        echo "version=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
-        echo "tarball_sha256=$TARBALL_SHA256" >> "$GITHUB_OUTPUT"
-        echo "desktop_sha256=$DESKTOP_SHA256" >> "$GITHUB_OUTPUT"
+        {
+            echo "new_version=true"
+            echo "version=$LATEST_VERSION"
+            echo "tarball_sha256=$TARBALL_SHA256"
+            echo "desktop_sha256=$DESKTOP_SHA256"
+        } >> "$GITHUB_OUTPUT"
     fi
     
     exit 0
